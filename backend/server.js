@@ -79,7 +79,7 @@ app.post('/signin', function(req, res){
 		}
 	});
 });
-
+//checks if page has auhtorization
 app.get('/me', ensureAuthorized, function(req, res){
 	User.findOne({token: req.token}, function(err, user){
 		if(err){
@@ -95,3 +95,27 @@ app.get('/me', ensureAuthorized, function(req, res){
 		}
 	});
 });
+
+//Catch and display errors
+process.on("uncaughtException", function(err){
+	console.log(err);
+});
+
+//start server
+app.listen(port, function(){
+	console.log("Express server listentin on port" + port);
+});
+
+//checks for headers authorization and sets token if it exists
+function ensureAthorized (req, res, next){
+	var bearerToken;
+	var bearerHeader = req.headers["authorization"];
+	if (typeof bearerHeader !== 'undefined'){
+		var bearer = bearerHeader.split(" ");
+		bearerToken = bearer[1];
+		req.token = bearerToken;
+		next(); 
+	} else {
+		res.send(403);
+	}
+}
